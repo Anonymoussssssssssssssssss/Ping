@@ -1,63 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XML-RPC Pingback</title>
+  <meta charset="UTF-8">
+  <title>Pingback Source Test</title>
 </head>
 <body>
+  <h1>Pingback Test Page</h1>
+  <p>This page contains a pingback-enabled link to a target site.</p>
 
-    <h2>XML-RPC Pingback</h2>
+  <!-- Link harus dalam tag <a> -->
+  <a href="https://ptinquest.com">Visit ptinquest.com</a>
 
-    <form id="pingback-form">
-        <label for="source-url">Source URL:</label>
-        <input type="url" id="source-url" placeholder="http://example.com" required><br><br>
-
-        <label for="target-url">Target URL:</label>
-        <input type="url" id="target-url" placeholder="https://ptinquest.com" required><br><br>
-
-        <button type="submit">Ping</button>
-    </form>
-
-    <div id="response"></div>
-
-    <script>
-        document.getElementById("pingback-form").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent form from submitting the default way
-
-            let sourceUrl = document.getElementById("source-url").value;
-            let targetUrl = document.getElementById("target-url").value;
-
-            // Construct the XML-RPC payload
-            let xml = `<?xml version="1.0"?>
-            <methodCall>
-                <methodName>pingback.ping</methodName>
-                <params>
-                    <param><value><string>${sourceUrl}</string></value></param>
-                    <param><value><string>${targetUrl}</string></value></param>
-                </params>
-            </methodCall>`;
-
-            // Use a proxy to avoid CORS issues
-            fetch("https://cors-anywhere.herokuapp.com/https://ptinquest.com/xmlrpc.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/xml",
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: xml
-            })
-            .then(response => response.text())
-            .then(data => {
-                // Display the response from the server
-                document.getElementById("response").textContent = "Response: " + data;
-            })
-            .catch(error => {
-                // Display any error message
-                document.getElementById("response").textContent = "Error: " + error;
-            });
-        });
-    </script>
+  <!-- Optional: Tulis dalam bentuk artikel, bisa meningkatkan validitas parser -->
+  <article>
+    <h2>Testing Pingback to ptinquest.com</h2>
+    <p>This article is created as a test to send a pingback to <a href="https://ptinquest.com">this site</a>.</p>
+  </article>
 
 </body>
 </html>
