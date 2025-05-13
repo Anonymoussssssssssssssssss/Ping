@@ -1,10 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link rel="pingback" href="https://ptinquest.com/xmlrpc.php" />
-  <title>Test Pingback</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pingback</title>
 </head>
 <body>
-  Pingback test page.
+    <h1>Pingback Ping</h1>
+    <form id="pingForm">
+        <label for="sourceUrl">Source URL:</label>
+        <input type="text" id="sourceUrl" name="sourceUrl" placeholder="Enter source URL">
+        <br>
+        <label for="targetUrl">Target URL:</label>
+        <input type="text" id="targetUrl" name="targetUrl" placeholder="Enter target URL">
+        <br>
+        <button type="button" onclick="sendPing()">Send Pingback</button>
+    </form>
+
+    <script>
+        function sendPing() {
+            var sourceUrl = document.getElementById("sourceUrl").value;
+            var targetUrl = document.getElementById("targetUrl").value;
+
+            // Prepare XML data
+            var xmlData = '<?xml version="1.0"?>' +
+                          '<methodCall>' +
+                          '<methodName>pingback.ping</methodName>' +
+                          '<params>' +
+                          '<param><value><string>' + sourceUrl + '</string></value></param>' +
+                          '<param><value><string>' + targetUrl + '</string></value></param>' +
+                          '</params>' +
+                          '</methodCall>';
+
+            // Send XML-RPC request using fetch
+            fetch("https://ptinquest.com/xmlrpc.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/xml"
+                },
+                body: xmlData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                console.log("Pingback Response:", responseText);
+                alert("Pingback Sent! Check the console for the response.");
+            })
+            .catch(error => {
+                console.error("Error sending pingback:", error);
+                alert("Error sending pingback.");
+            });
+        }
+    </script>
 </body>
 </html>
