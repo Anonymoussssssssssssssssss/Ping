@@ -1,50 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pingback Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML-RPC Pingback</title>
 </head>
 <body>
-  <h1>Pingback Request</h1>
-  <form id="pingback-form" action="https://ptinquest.com/xmlrpc.php" method="POST">
-    <label for="source-url">Source URL:</label>
-    <input type="text" id="source-url" name="source-url" value="http://127.0.0.1" required><br><br>
-    
-    <label for="target-url">Target URL:</label>
-    <input type="text" id="target-url" name="target-url" value="https://ptinquest.com" required><br><br>
 
-    <button type="submit">Send Pingback</button>
-  </form>
+    <h2>XML-RPC Pingback</h2>
 
-  <script>
-    document.getElementById("pingback-form").addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent form from submitting the default way
+    <form id="pingback-form">
+        <label for="source-url">Source URL:</label>
+        <input type="url" id="source-url" placeholder="http://example.com" required><br><br>
 
-      let sourceUrl = document.getElementById("source-url").value;
-      let targetUrl = document.getElementById("target-url").value;
+        <label for="target-url">Target URL:</label>
+        <input type="url" id="target-url" placeholder="https://ptinquest.com" required><br><br>
 
-      let xml = `<?xml version="1.0"?>
-      <methodCall>
-        <methodName>pingback.ping</methodName>
-        <params>
-          <param><value><string>${sourceUrl}</string></value></param>
-          <param><value><string>${targetUrl}</string></value></param>
-        </params>
-      </methodCall>`;
+        <button type="submit">Ping</button>
+    </form>
 
-      // Use fetch to send POST request
-      fetch("https://ptinquest.com/xmlrpc.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/xml"
-        },
-        body: xml
-      })
-      .then(response => response.text())
-      .then(data => alert("Pingback response: " + data))
-      .catch(error => alert("Error: " + error));
-    });
-  </script>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById("pingback-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form from submitting the default way
+
+            let sourceUrl = document.getElementById("source-url").value;
+            let targetUrl = document.getElementById("target-url").value;
+
+            // Construct the XML-RPC payload
+            let xml = `<?xml version="1.0"?>
+            <methodCall>
+                <methodName>pingback.ping</methodName>
+                <params>
+                    <param><value><string>${sourceUrl}</string></value></param>
+                    <param><value><string>${targetUrl}</string></value></param>
+                </params>
+            </methodCall>`;
+
+            // Use a proxy to avoid CORS issues
+            fetch("https://cors-anywhere.herokuapp.com/https://ptinquest.com/xmlrpc.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/xml",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: xml
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display the response from the server
+                document.getElementById("response").textContent = "Response: " + data;
+            })
+            .catch(error => {
+                // Display any error message
+                document.getElementById("response").textContent = "Error: " + error;
+            });
+        });
+    </script>
+
 </body>
 </html>
