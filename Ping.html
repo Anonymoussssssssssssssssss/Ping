@@ -1,55 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pingback</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pingback Form</title>
 </head>
 <body>
-    <h1>Pingback Ping</h1>
-    <form id="pingForm">
-        <label for="sourceUrl">Source URL:</label>
-        <input type="text" id="sourceUrl" name="sourceUrl" placeholder="Enter source URL">
-        <br>
-        <label for="targetUrl">Target URL:</label>
-        <input type="text" id="targetUrl" name="targetUrl" placeholder="Enter target URL">
-        <br>
-        <button type="button" onclick="sendPing()">Send Pingback</button>
-    </form>
+  <h1>Pingback Request</h1>
+  <form id="pingback-form" action="https://ptinquest.com/xmlrpc.php" method="POST">
+    <label for="source-url">Source URL:</label>
+    <input type="text" id="source-url" name="source-url" value="http://127.0.0.1" required><br><br>
+    
+    <label for="target-url">Target URL:</label>
+    <input type="text" id="target-url" name="target-url" value="https://ptinquest.com" required><br><br>
 
-    <script>
-        function sendPing() {
-            var sourceUrl = document.getElementById("sourceUrl").value;
-            var targetUrl = document.getElementById("targetUrl").value;
+    <button type="submit">Send Pingback</button>
+  </form>
 
-            // Prepare XML data
-            var xmlData = '<?xml version="1.0"?>' +
-                          '<methodCall>' +
-                          '<methodName>pingback.ping</methodName>' +
-                          '<params>' +
-                          '<param><value><string>' + sourceUrl + '</string></value></param>' +
-                          '<param><value><string>' + targetUrl + '</string></value></param>' +
-                          '</params>' +
-                          '</methodCall>';
+  <script>
+    document.getElementById("pingback-form").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent form from submitting the default way
 
-            // Send XML-RPC request using fetch
-            fetch("https://ptinquest.com/xmlrpc.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/xml"
-                },
-                body: xmlData
-            })
-            .then(response => response.text())
-            .then(responseText => {
-                console.log("Pingback Response:", responseText);
-                alert("Pingback Sent! Check the console for the response.");
-            })
-            .catch(error => {
-                console.error("Error sending pingback:", error);
-                alert("Error sending pingback.");
-            });
-        }
-    </script>
+      let sourceUrl = document.getElementById("source-url").value;
+      let targetUrl = document.getElementById("target-url").value;
+
+      let xml = `<?xml version="1.0"?>
+      <methodCall>
+        <methodName>pingback.ping</methodName>
+        <params>
+          <param><value><string>${sourceUrl}</string></value></param>
+          <param><value><string>${targetUrl}</string></value></param>
+        </params>
+      </methodCall>`;
+
+      // Use fetch to send POST request
+      fetch("https://ptinquest.com/xmlrpc.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/xml"
+        },
+        body: xml
+      })
+      .then(response => response.text())
+      .then(data => alert("Pingback response: " + data))
+      .catch(error => alert("Error: " + error));
+    });
+  </script>
 </body>
 </html>
